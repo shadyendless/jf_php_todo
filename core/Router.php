@@ -38,9 +38,22 @@ class Router
     {
         // about/culture
         if (array_key_exists($uri, $this->routes[$request_type])) {
-            return $this->routes[$request_type][$uri];
+            // PagesController@home
+            return $this->callAction(
+                ...explode('@', $this->routes[$request_type][$uri])
+            );
         }
 
         throw new Exception('No route defined for this URI.');
+    }
+
+    protected function callAction($controller, $action)
+    {
+        if (!method_exists(new $controller, $action)) {
+            throw new Exception(
+                "{$controller} does not respond to the {$action} action."
+            );
+        }
+        return (new $controller)->$action();
     }
 }
